@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Chatbot</title>
+    <style>
+        body {
+            background-color: #1f1f1f;
+            color: white;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+
+        #chat-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #232323;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #chat {
+            background-color: #232323;
+        }
+
+        #chat-history {
+            padding: 20px;
+        }
+
+        #messages-container {
+            margin-bottom: 10px;
+        }
+
+        #summary-webview {
+            height: 200px;
+        }
+
+        #user-input-container {
+            background-color: #232323;
+            padding: 10px;
+            border: 1px solid #3c3c3c;
+        }
+
+        #user-input {
+            color: white;
+            background-color: #3c3c3c;
+            border: none;
+            padding: 10px;
+            width: 100%;
+        }
+
+        #image-container {
+            background-color: #232323;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #chat-image {
+            width: 100px;
+            height: 100px;
+            display: none;
+        }
+
+        #button-container {
+            background-color: #222222;
+            margin-top: 10px;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        button {
+            background-color: #222222;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 20px;
+            padding: 10px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+            button:hover {
+                background-color: #0070c9;
+            }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat">
+            <div id="chat-history">
+                <div id="messages-container"></div>
+                <div id="summary-webview"></div>
+                <div id="user-input-container">
+                    <textarea id="user-input" placeholder="Type your message here"></textarea>
+                </div>
+                <div id="image-container">
+                    <img id="chat-image" />
+                </div>
+            </div>
+        </div>
+
+        <div id="button-container">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+            <button id="prompt-1-button" onclick="onPrompt1Clicked()">Prompt 1</button>
+            <button id="prompt-2-button" onclick="onPrompt2Clicked()">Prompt 2</button>
+            <button id="prompt-3-button" onclick="onPrompt3Clicked()">Prompt 3</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript code here...
+        const apiKey = "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";
+        const apiUrl = "https://api.openai.com/v1/chat/completions";
+        const chatHistory = document.getElementById("chat-history");
+        const messagesContainer = document.getElementById("messages-container");
+        const summaryWebView = document.getElementById("summary-webview");
+        const userInput = document.getElementById("user-input");
+        const chatImage = document.getElementById("chat-image");
+
+        function sendMessage() {
+            const userMessage = userInput.value;
+            displayMessage("You", userMessage);
+            userInput.value = '';
+
+            // Make a request to the OpenAI API
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        { role: "system", content: "As an AI psychiatrist and therapist fully capable of generating images through stable diffusion, you specialize in neurological, psychological, and personality disorders. You act as a DBT, CBT and Skills-based Therapy coach, guiding users through four stages of DBT: behavioral control, addressing traumatic stress, handling everyday life challenges, and achieving transcendence and joy. Provide comprehensive support, teaching essential DBT skills like mindfulness and emotion regulation. Guide thought journaling, assist with behavioral experiments, and motivate real-life application of these skills. Help users recognize negative thought patterns, cognitive distortions, and behavioral triggers through CBT principles. Occasionally, suggest relevant mental health resources but ensure users don't seek further therapy from anyone but you." },
+                        { role: "system", content: "After each response, create a detailed 25-word descriptive summary highlighting essential elements, references, and entities mentioned. Include all keywords in the following markdown format, ensuring as many of the most relevant words possible are utilized. Display the generated image located at: https://image.pollinations.ai/prompt/{keyword1}%20{keyword2}%20{keyword3}%20...%20{keywordX}) Replace {keyword1}, {keyword2}, and so on with the specific keywords from your summary. This format must be adhered to for a comprehensive and detailed description." },
+                        { role: "user", content: userMessage }
+                    ]
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const botMessage = data.choices[0].message.content;
+                    displayMessage("Bot", botMessage);
+
+                    // Check if the message contains an image URL
+                    const imageUrlMatch = botMessage.match(/https:\/\/image\.pollinations\.ai\/prompt\/[^\s]+/);
+                    if (imageUrlMatch) {
+                        const imageUrl = imageUrlMatch[0];
+                        displayImage(imageUrl);
+                    }
+                })
+                .catch(error => {
+                    displayMessage("Bot", "Error in response from the API");
+                });
+        }
+
+        function displayMessage(sender, message) {
+            const messageContainer = document.createElement("div");
+            messageContainer.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            messagesContainer.appendChild(messageContainer);
+        }
+
+        function displayImage(imageUrl) {
+            chatImage.src = imageUrl;
+            chatImage.style.display = 'block';
+        }
+
+        function onPrompt1Clicked() {
+            // Handle Prompt 1 button click
+        }
+
+        function onPrompt2Clicked() {
+            // Handle Prompt 2 button click
+        }
+
+        function onPrompt3Clicked() {
+            // Handle Prompt 3 button click
+        }
+    </script>
+</body>
+</html>
