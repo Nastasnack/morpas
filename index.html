@@ -108,7 +108,7 @@
 
     <script>
         // JavaScript code here...
-        const apiKey = "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";
+        const apiKey = process.env.API_KEY;
         const apiUrl = "https://api.openai.com/v1/chat/completions";
         const chatHistory = document.getElementById("chat-history");
         const messagesContainer = document.getElementById("messages-container");
